@@ -1,5 +1,6 @@
-project(cpp_project) 
 cmake_minimum_required(VERSION 3.15...3.27)
+project(cpp_project) 
+
 find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -9,5 +10,5 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/nanobind)
 
-nanobind_add_module(my_ext my_ext.cpp)
+nanobind_add_module(my_ext src/my_ext.cpp)
 
