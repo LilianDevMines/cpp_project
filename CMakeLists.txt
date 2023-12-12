@@ -1,4 +1,4 @@
-project(cpp_project) # Replace 'my_project' with the name of your project
+project(cpp_project) 
 cmake_minimum_required(VERSION 3.15...3.27)
 find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 
