@@ -1,3 +1,7 @@
 [submodule "ext/nanobind"]
 	path = ext/nanobind
 	url = https://github.com/wjakob/nanobind
+[submodule "ext/pybind11"]
+	path = ext/pybind11
+	url = ../../pybind/pybind11
+	branch = stable
