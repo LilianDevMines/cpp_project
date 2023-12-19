@@ -9,7 +9,7 @@ struct Particle {
   Vec2 position = {};   // current position of the particle
   Vec2 next_pos = {};   // only used during update loop
   Vec2 velocity = {};   // current velocity of the particle
-  float mass = 0;
+  float mass = 1.0F;
   float radius  = 1.0F; // radius of the particle
   int draw_id   = 0;    // id used to identify drawing element associated to the sphere
 };

@@ -23,9 +23,9 @@ void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int
     particle.mass = mass;
     particle.velocity = velocity;
     particle.draw_id = draw_id;
-    this->m_particles[++m_num_particles] = particle;
+    this->m_particles[m_num_particles++] = particle;
 }
-
+// ------------------------------------------------
 
 void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {

@@ -12,10 +12,12 @@ public:
 
   int num_particles() const { return m_num_particles; }
 
-  void updatePhysicalSystem(float dt, int num_constraint_relaxation);
-
   void addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id);
 
+  const Particle& particle(int id) const { return m_particles[id]; }
+
+  void updatePhysicalSystem(float dt, int num_constraint_relaxation);
+  
 private:
   // Methods below are called by updatePhysicalSystem
   void applyExternalForce(float dt);

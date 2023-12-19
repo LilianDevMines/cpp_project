@@ -57,6 +57,10 @@ class ParticleUI :
             
         for i in range(self.context.num_particles()):
             # TODO Update particle display coordinate
+            particle = self.context.particle(i)
+            pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
+            pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
+            self.canvas.coords(particle.draw_id, *self.worldToView(pmin), * self.worldToView(pmax))
             print("Update code to display particules !")
             print(" - Use the function coord from Tk.Canvas to update the bounding box of displayed ellipses corresponding to parameters")
             print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
@@ -79,7 +83,8 @@ class ParticleUI :
         #b_min = self.worldToView( (x_world-radius,y_world-radius) )
         #b_max = self.worldToView( (x_world+radius,y_world+radius) )
         draw_id = self.canvas.create_oval(0,0,0,0,fill=color)
-        # TODO add particle in C++ context 
+        # TODO add particle in C++ context
+        self.context.addParticle(pbd.Vec2(*world_pos), radius, mass, pbd.Vec2(*velocity), draw_id)
         print("Update code to add particules!")
         print("  - You will also need a function on c++ side")
         print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
