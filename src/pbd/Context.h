@@ -2,6 +2,7 @@
 
 #include "Vec2.h"
 #include "Particle.h"
+#include "Plan.h"
 
 // ------------------------------------------------
 
@@ -11,8 +12,10 @@ public:
   Context(int capacity);
 
   int num_particles() const { return m_num_particles; }
+  int num_plans() const { return m_num_plans; }
 
   void addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id);
+  void addPlan(Vec2 coord1, Vec2 coord2);
 
   const Particle& particle(int id) const { return m_particles[id]; }
 
@@ -32,7 +35,9 @@ private:
 
 private:
   int m_num_particles;
+  int m_num_plans;
   Particle* m_particles;
+  Plan* m_plans;
 };
 
 // ------------------------------------------------

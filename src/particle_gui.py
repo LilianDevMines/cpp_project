@@ -34,8 +34,9 @@ class ParticleUI :
         self.canvas.pack()
 
         # Initialize the scene
-        self.addParticle((0,0), 2.0, 1.0, (0.0, 0.0), "orange")
+        self.addParticle((0,0), 2.0, 1.0, (1, 0.0), "orange")
         self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
+        self.addPlan((0,100),(self.width,100))
         
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))
@@ -54,7 +55,6 @@ class ParticleUI :
         # APPLY PHYSICAL UPDATES HERE !
         for i in range(6) :
             self.context.updatePhysicalSystem(0.016/6.0, 1) # can be called more than once..., just devise dt
-            
         for i in range(self.context.num_particles()):
             # TODO Update particle display coordinate
             particle = self.context.particle(i)
@@ -69,7 +69,7 @@ class ParticleUI :
         self.window.update()
         self.window.after(16, self.animate)
 
-    # Conversion from worl space (simulation) to display space (tkinter canvas)
+    # Conversion from world space (simulation) to display space (tkinter canvas)
     def worldToView(self, world_pos) :
         return ( self.width *(0.5 + (world_pos[0]/self.world_x_max) * 0.5),
                  self.height *(0.5 - (world_pos[1]/self.world_y_max) * 0.5)) 
@@ -89,6 +89,10 @@ class ParticleUI :
         print("  - You will also need a function on c++ side")
         print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
         # END TODO
+
+    def addPlan(self, coord1, coord2):
+        self.canvas.create_line(coord1[0],coord1[1],coord2[0],coord2[1],fill="black")
+        self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
 
     # All mouse and key callbacks
 

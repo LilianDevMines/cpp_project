@@ -6,12 +6,16 @@
 #include <assert.h>
 #include <math.h>
 
+
+const float g = 9.81;
 // ------------------------------------------------
 
 Context::Context(int capacity)
 {
   this->m_num_particles = 0;
   this->m_particles = new Particle[capacity];
+  this->m_num_plans = 0;
+  this->m_plans = new Plan[capacity];
 }
 
 // ------------------------------------------------
@@ -25,18 +29,17 @@ void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int
     particle.draw_id = draw_id;
     this->m_particles[m_num_particles++] = particle;
 }
-// ------------------------------------------------
+
+void Context::addPlan(Vec2 coord1, Vec2 coord2) {
+    //Il faut ici ajouter un élément de la classe Particle au tableau m_particles dont le numéro est m_num_particles
+    struct Plan plan;
+    plan.coord1 = coord1;
+    plan.coord2 = coord2;
+    this->m_plans[m_num_plans++] = plan;
+}
 
 void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {
-#define FIXED_VELOCITY
-#ifdef FIXED_VELOCITY
-  for (int i = 0; i<m_num_particles; i++){
-    this->m_particles[i].position.x += dt*this->m_particles[i].velocity.x;
-    this->m_particles[i].position.y += dt*this->m_particles[i].velocity.y;
-  }
-  // TODO For testing purposes, add an update of position based on particle velocity
-#else
   applyExternalForce(dt);
   dampVelocities(); // Frottements
   updateExpectedPosition(dt); // Position attendue en fonction de la vitesse
@@ -51,13 +54,17 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
   applyFriction();
 
   deleteContactConstraints();
-#endif
 }
 
 // ------------------------------------------------
 
 void Context::applyExternalForce(float dt)
 {
+  float weight =  - g*dt;
+  for (int i =0;i <this->m_num_particles; i++){
+    this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x,this->m_particles[i].velocity.y + weight};
+    this->m_particles[i].next_pos = Vec2{this->m_particles[i].position.x, this->m_particles[i].position.y +m_particles[i].velocity.y * dt};
+  }
 }
 
 void Context::dampVelocities()
@@ -66,6 +73,9 @@ void Context::dampVelocities()
 
 void Context::updateExpectedPosition(float dt)
 {
+  for (int i =0;i <this->m_num_particles; i++){
+    this->m_particles[i].position = this->m_particles[i].next_pos;
+  }
 }
 
 void Context::addDynamicContactConstraints()

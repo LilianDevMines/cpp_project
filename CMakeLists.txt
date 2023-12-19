@@ -15,8 +15,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/pybind11)
 add_library(pbd_simulation 
   src/pbd/Context.cpp
   src/pbd/Context.h
-  src/pbd/Particle.h
+  src/pbd/Plan.cpp
+  src/pbd/Plan.h
   src/pbd/Particle.cpp
+  src/pbd/Particle.h
   src/pbd/Vec2.cpp
   src/pbd/Vec2.h
 )
