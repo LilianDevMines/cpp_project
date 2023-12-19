@@ -15,8 +15,15 @@ Context::Context(int capacity)
 }
 
 // ------------------------------------------------
-void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id){
-  
+void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id) {
+    //Il faut ici ajouter un élément de la classe Particle au tableau m_particles dont le numéro est m_num_particles
+    struct Particle particle;
+    particle.position = pos;
+    particle.radius = radius;
+    particle.mass = mass;
+    particle.velocity = velocity;
+    particle.draw_id = draw_id;
+    this->m_particles[++m_num_particles] = particle;
 }
 
 
