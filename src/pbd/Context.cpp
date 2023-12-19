@@ -31,12 +31,16 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {
 #define FIXED_VELOCITY
 #ifdef FIXED_VELOCITY
+  for (int i = 0; i<m_num_particles; i++){
+    this->m_particles[i].position.x += dt*this->m_particles[i].velocity.x;
+    this->m_particles[i].position.y += dt*this->m_particles[i].velocity.y;
+  }
   // TODO For testing purposes, add an update of position based on particle velocity
 #else
   applyExternalForce(dt);
-  dampVelocities();
-  updateExpectedPosition(dt);
-  addDynamicContactConstraints();
+  dampVelocities(); // Frottements
+  updateExpectedPosition(dt); // Position attendue en fonction de la vitesse
+  addDynamicContactConstraints(); // Itérer sur les différents types de contraintes (chevauchement avec un colider / autre particule)
   addStaticContactConstraints();
  
   for(int k=0; k<num_constraint_relaxation; ++k) {
