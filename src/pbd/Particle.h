@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pbd/Vec2.h"
+#include "Vec2.h"
 #include <stdint.h>
 
 // ------------------------------------------------

@@ -1,4 +1,4 @@
-#include "pbd/Context.h"
+#include "Context.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +15,10 @@ Context::Context(int capacity)
 }
 
 // ------------------------------------------------
+void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id){
+  
+}
+
 
 void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {

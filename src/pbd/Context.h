@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pbd/Vec2.h"
-#include "pbd/Particle.h"
+#include "Vec2.h"
+#include "Particle.h"
 
 // ------------------------------------------------
 
@@ -13,6 +13,8 @@ public:
   int num_particles() const { return m_num_particles; }
 
   void updatePhysicalSystem(float dt, int num_constraint_relaxation);
+
+  void addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id);
 
 private:
   // Methods below are called by updatePhysicalSystem

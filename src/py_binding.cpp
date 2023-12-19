@@ -11,10 +11,13 @@ namespace py = pybind11;
 PYBIND11_MODULE(py_pbd_simulation, m) 
 {
     // TODO Add additionnal binding here for Particle and Vec2 ! 
+    py::class_<Vec2>(m,"Vec2")
+        .def(py::init<float,float>());
 
     py::class_<Context>(m, "Context")
         .def(py::init<int>())
         .def("num_particles", &Context::num_particles)
-        .def("updatePhysicalSystem", &Context::updatePhysicalSystem);
+        .def("updatePhysicalSystem", &Context::updatePhysicalSystem)
+        .def("addParticle", &Context::addParticle);
 }
 
