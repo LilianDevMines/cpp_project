@@ -54,6 +54,21 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 
 void Context::applyExternalForce(float dt)
 {
+<<<<<<< Updated upstream
+=======
+  float weight =  - g*dt;
+  for (int i =0;i <this->m_num_particles; i++){
+    this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x,this->m_particles[i].velocity.y + weight};
+    this->m_particles[i].next_pos = Vec2{this->m_particles[i].position.x, this->m_particles[i].position.y +m_particles[i].velocity.y * dt};
+  }
+  /*for (int i =0;i <this->m_num_particles; i++){
+    for (int p =0;p <this->m_num_plans; p++){
+      if (this->m_particles[i].next_pos.y < this->m_plans[p].coord2.y){
+        this->m_particles[i].next_pos.y = this->m_plans[p].coord2.y + this->m_particles[i].radius;
+      }
+    }
+  }*/
+>>>>>>> Stashed changes
 }
 
 void Context::dampVelocities()
@@ -62,14 +77,31 @@ void Context::dampVelocities()
 
 void Context::updateExpectedPosition(float dt)
 {
+<<<<<<< Updated upstream
+=======
+  for (int i =0;i <this->m_num_particles; i++){
+    for (int p =0;p <this->m_num_plans; p++){
+      if (this->m_particles[i].next_pos.y < this->m_plans[p].coord2.y){
+        this->m_particles[i].next_pos.y = this->m_plans[p].coord2.y + this->m_particles[i].radius;
+      }
+      this->m_particles[i].position = this->m_particles[i].next_pos;
+    }
+  }
+>>>>>>> Stashed changes
 }
 
 void Context::addDynamicContactConstraints()
 {
 }
 
-void Context::addStaticContactConstraints()
-{
+void Context::addStaticContactConstraints(){
+  /*for (int i =0;i <this->m_num_particles; i++){
+    for (int p =0;p <this->m_num_plans; p++){
+      if (this->m_particles[i].next_pos.y < this->m_plans[p].coord2.y){
+        this->m_particles[i].next_pos.y = this->m_plans[p].coord2.y + this->m_particles[i].radius;
+      }
+    }
+  }*/
 }
 
 void Context::projectConstraints()
