@@ -1,6 +1,7 @@
 #include "Context.h"
 
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -63,7 +64,7 @@ void Context::applyExternalForce(float dt)
   float weight =  - g*dt;
   for (int i =0;i <this->m_num_particles; i++){
     this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x,this->m_particles[i].velocity.y + weight};
-    this->m_particles[i].next_pos = Vec2{this->m_particles[i].position.x, this->m_particles[i].position.y +m_particles[i].velocity.y * dt};
+    this->m_particles[i].next_pos = Vec2{this->m_particles[i].position.x + m_particles[i].velocity.x * dt, this->m_particles[i].position.y + m_particles[i].velocity.y * dt};
   }
   /*for (int i =0;i <this->m_num_particles; i++){
     for (int p =0;p <this->m_num_plans; p++){
@@ -81,12 +82,7 @@ void Context::dampVelocities()
 void Context::updateExpectedPosition(float dt)
 {
   for (int i =0;i <this->m_num_particles; i++){
-    /*for (int p =0;p <this->m_num_plans; p++){
-      if (this->m_particles[i].next_pos.y < this->m_plans[p].coord2.y){
-        this->m_particles[i].next_pos.y = this->m_plans[p].coord2.y + this->m_particles[i].radius;
-      }*/
-      this->m_particles[i].position = this->m_particles[i].next_pos;
-    //}
+    this->m_particles[i].position = this->m_particles[i].next_pos;
   }
 }
 
@@ -95,13 +91,13 @@ void Context::addDynamicContactConstraints()
 }
 
 void Context::addStaticContactConstraints(){
-  /*for (int i =0;i <this->m_num_particles; i++){
+  for (int i =0;i <this->m_num_particles; i++){
     for (int p =0;p <this->m_num_plans; p++){
-      if (this->m_particles[i].next_pos.y < this->m_plans[p].coord2.y){
-        this->m_particles[i].next_pos.y = this->m_plans[p].coord2.y + this->m_particles[i].radius;
+      if (this->m_particles[i].next_pos.y - this->m_particles[i].radius < this->m_plans[p].coord2.y){
+        this->m_particles[i].position.y = this->m_plans[p].coord1.y + this->m_particles[i].radius;
       }
     }
-  }*/
+  }
 }
 
 void Context::projectConstraints()
