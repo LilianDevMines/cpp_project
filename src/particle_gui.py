@@ -35,8 +35,8 @@ class ParticleUI :
 
         # Initialize the scene
         self.addParticle((0,0), 2.0, 1.0, (1, 0.0), "orange")
-        self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
-        self.addPlan((0,100),(self.width,100))
+        #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
+        self.addPlan((0,900),(self.width,900))
         
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))
@@ -91,7 +91,7 @@ class ParticleUI :
         # END TODO
 
     def addPlan(self, coord1, coord2):
-        self.canvas.create_line(coord1[0],coord1[1],coord2[0],coord2[1],fill="black")
+        self.canvas.create_line(coord1[0],coord1[1],coord2[0],coord2[1],fill="red")
         self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
 
     # All mouse and key callbacks
