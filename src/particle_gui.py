@@ -34,7 +34,7 @@ class ParticleUI :
         self.canvas.pack()
 
         # Initialize the scene
-        self.addParticle((0,0), 2.0, 1.0, (1, 0.0), "orange")
+        self.addParticle((0,0), 2.0, 1.0, (0.0, 0.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
         self.addPlan((-10,-8),(10,-8))
         
@@ -97,7 +97,7 @@ class ParticleUI :
     # All mouse and key callbacks
 
     def mouseCallback(self, event):
-        self.addParticle(self.viewToWorld((event.x,event.y)), 0.2, 1.0, (1.0, 0.0), "red")
+        self.addParticle(self.viewToWorld((event.x,event.y)), 0.2, 1.0, (0.0, 0.0), "red")
     
     def keyCallback(self, event):
         print(repr(event.char))
