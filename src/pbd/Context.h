@@ -38,6 +38,9 @@ private:
   int m_num_plans;
   Particle* m_particles;
   Plan* m_plans;
+
+private :
+  Vec2 distancetoPlan(Plan plan);
 };
 
 // ------------------------------------------------
