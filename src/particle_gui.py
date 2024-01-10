@@ -37,6 +37,8 @@ class ParticleUI :
         self.addParticle((0,8), 2.0, 1.0, (0.0, 0.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
         self.addPlan((-10,-8),(10,8))
+        self.addPlan((-10,0),(10,-8))
+        self.addPlan((-10,-2),(10,-2))
         
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))

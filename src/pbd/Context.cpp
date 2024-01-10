@@ -121,15 +121,13 @@ void Context::projectConstraints()
 void Context::updateVelocityAndPosition(float dt)
 {
   for (int i =0;i <this->m_num_particles; i++){
-    for (int p =0;p <this->m_num_plans; p++){
       //update velocity
       this->m_particles[i].velocity = Vec2{(this->m_particles[i].next_pos.x - this->m_particles[i].position.x)/dt,
                                             (this->m_particles[i].next_pos.y - this->m_particles[i].position.y)/dt};
       //update position
       this->m_particles[i].position = this->m_particles[i].next_pos;
-    }
-  }                         
-}
+   }
+}                         
 
 void Context::applyFriction()
 {
