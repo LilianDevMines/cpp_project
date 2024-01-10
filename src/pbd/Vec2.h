@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 // ------------------------------------------------
 
 struct Vec2 {
@@ -11,3 +12,5 @@ struct Vec2 {
 // tools for calculus
 
 float produit_scalaire(Vec2 a, Vec2 b);
+
+float norme(Vec2 a);

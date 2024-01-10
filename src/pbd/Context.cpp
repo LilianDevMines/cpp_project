@@ -61,8 +61,8 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 
 void Context::applyExternalForce(float dt)
 {
-  Vec2 Weight{0, - g};
   for (int i =0;i <this->m_num_particles; i++){
+    Vec2 Weight{0, - (this->m_particles[i].mass *g)};
     this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x + (dt*Weight.x)/(this->m_particles[i].mass),
                                         this->m_particles[i].velocity.y + (dt*Weight.y)/(this->m_particles[i].mass)};
   }
@@ -81,7 +81,33 @@ void Context::updateExpectedPosition(float dt)
 }
 
 void Context::addDynamicContactConstraints()
-{
+{ 
+  for (int i =0;i <this->m_num_particles; i++){
+    for (int j =0;j <this->m_num_particles; j++){
+      if (i!=j){
+        //xij
+        Vec2 xij = Vec2{this->m_particles[i].next_pos.x - this->m_particles[j].next_pos.x,
+                        this->m_particles[i].next_pos.y - this->m_particles[j].next_pos.y};
+
+        //C
+        float C = norme(xij) - (this->m_particles[i].radius + this->m_particles[j].radius);
+
+        if (C < 0){
+
+        //sigma
+        float sigmai = (1/this->m_particles[i].mass)/((1/this->m_particles[i].mass) + (1/this->m_particles[j].mass));
+        float sigmaj = (1/this->m_particles[j].mass)/((1/this->m_particles[i].mass) + (1/this->m_particles[j].mass));
+
+        Vec2 deltaposi = Vec2{-sigmai * (xij.x/norme(xij)), -sigmai * (xij.y/norme(xij))};
+        Vec2 deltaposj = Vec2{sigmaj * (xij.x/norme(xij)), sigmaj * (xij.y/norme(xij))};
+
+          //update next_pos
+          this->m_particles[i].next_pos = Vec2{this->m_particles[i].next_pos.x + deltaposi.x, this->m_particles[i].next_pos.y + deltaposi.y};
+          this->m_particles[j].next_pos = Vec2{this->m_particles[j].next_pos.x + deltaposj.x, this->m_particles[j].next_pos.y + deltaposj.y};
+        }
+      }
+    }
+  }
 }
 
 void Context::addStaticContactConstraints(){
