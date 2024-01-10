@@ -93,8 +93,17 @@ class ParticleUI :
         # END TODO
 
     def addPlan(self, coord1, coord2):
-        self.canvas.create_line(*self.worldToView(coord1), * self.worldToView(coord2),fill="red")
+        # Convert world coordinates to view coordinates
+        view_coord1 = self.worldToView(coord1)
+        view_coord2 = self.worldToView(coord2)
+
+        # Create a polygon that represents the area under the line
+        points = [view_coord1[0], self.height, view_coord1[0], view_coord1[1], view_coord2[0], view_coord2[1], view_coord2[0], self.height]
+        self.canvas.create_polygon(points, fill='#AEC6CF')
+
+        # Add the plan to the context
         self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
+
 
     # All mouse and key callbacks
 
