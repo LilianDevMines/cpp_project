@@ -34,11 +34,16 @@ class ParticleUI :
         self.canvas.pack()
 
         # Initialize the scene
-        self.addParticle((0,8), 2.0, 1.0, (0.0, 0.0), "orange")
-        #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
+        #Add water
+        self.addWater((-10,0),(10,0))
+        
         self.addPlan((-10,-8),(10,8))
         self.addPlan((-10,0),(10,-8))
         self.addPlan((-10,-2),(10,-2))
+
+        #self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
+        #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
+        
         
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))
@@ -63,10 +68,10 @@ class ParticleUI :
             pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
             pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
             self.canvas.coords(particle.draw_id, *self.worldToView(pmin), * self.worldToView(pmax))
-            print("Update code to display particules !")
-            print(" - Use the function coord from Tk.Canvas to update the bounding box of displayed ellipses corresponding to parameters")
-            print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
-            print(" - worldToView return a tuple, tuple expension * can be used to generate list of function parameters")
+            # print("Update code to display particules !")
+            # print(" - Use the function coord from Tk.Canvas to update the bounding box of displayed ellipses corresponding to parameters")
+            # print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
+            # print(" - worldToView return a tuple, tuple expension * can be used to generate list of function parameters")
             # END TODO
         self.window.update()
         self.window.after(16, self.animate)
@@ -87,9 +92,9 @@ class ParticleUI :
         draw_id = self.canvas.create_oval(0,0,0,0,fill=color)
         # TODO add particle in C++ context
         self.context.addParticle(pbd.Vec2(*world_pos), radius, mass, pbd.Vec2(*velocity), draw_id)
-        print("Update code to add particules!")
-        print("  - You will also need a function on c++ side")
-        print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
+        # print("Update code to add particules!")
+        # print("  - You will also need a function on c++ side")
+        # print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
         # END TODO
 
     def addPlan(self, coord1, coord2):
@@ -99,10 +104,22 @@ class ParticleUI :
 
         # Create a polygon that represents the area under the line
         points = [view_coord1[0], self.height, view_coord1[0], view_coord1[1], view_coord2[0], view_coord2[1], view_coord2[0], self.height]
-        self.canvas.create_polygon(points, fill='#AEC6CF')
+        self.canvas.create_polygon(points, fill='#836953')
 
         # Add the plan to the context
         self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
+    
+    def addWater(self, coord1, coord2):
+        # Convert world coordinates to view coordinates
+        view_coord1 = self.worldToView(coord1)
+        view_coord2 = self.worldToView(coord2)
+
+        # Create a polygon that represents the area under the line
+        points = [view_coord1[0], self.height, view_coord1[0], view_coord1[1], view_coord2[0], view_coord2[1], view_coord2[0], self.height]
+        self.canvas.create_polygon(points, fill='#AEC6CF')
+
+        # Add the plan to the context
+        self.context.addWater(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
 
 
     # All mouse and key callbacks

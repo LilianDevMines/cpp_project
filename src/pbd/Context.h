@@ -3,6 +3,7 @@
 #include "Vec2.h"
 #include "Particle.h"
 #include "Plan.h"
+#include "Water.h"
 
 // ------------------------------------------------
 
@@ -16,6 +17,7 @@ public:
 
   void addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int draw_id);
   void addPlan(Vec2 coord1, Vec2 coord2);
+  void addWater(Vec2 coord1, Vec2 coord2);
 
   const Particle& particle(int id) const { return m_particles[id]; }
 
@@ -24,7 +26,7 @@ public:
 private:
   // Methods below are called by updatePhysicalSystem
   void applyExternalForce(float dt);
-  void dampVelocities();
+  void dampVelocities(float dt);
   void updateExpectedPosition(float dt);
   void addDynamicContactConstraints();
   void addStaticContactConstraints();
@@ -36,8 +38,10 @@ private:
 private:
   int m_num_particles;
   int m_num_plans;
+  int m_num_pounds;
   Particle* m_particles;
   Plan* m_plans;
+  Water* m_pounds;
 
 private :
   Vec2 distancetoPlan(Plan plan);

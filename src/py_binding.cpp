@@ -27,6 +27,7 @@ PYBIND11_MODULE(py_pbd_simulation, m)
         .def("updatePhysicalSystem", &Context::updatePhysicalSystem)
         .def("addParticle", &Context::addParticle)
         .def("particle", &Context::particle)
-        .def("addPlan", &Context::addPlan);
+        .def("addPlan", &Context::addPlan)
+        .def("addWater", &Context::addWater);
 }       
 

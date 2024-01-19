@@ -15,8 +15,10 @@ Context::Context(int capacity)
 {
   this->m_num_particles = 0;
   this->m_particles = new Particle[capacity];
-this->m_num_plans = 0;
+  this->m_num_plans = 0;
   this->m_plans = new Plan[capacity];
+  this->m_num_pounds = 0;
+  this->m_pounds = new Water[capacity];
 }
 
 // ------------------------------------------------
@@ -39,10 +41,18 @@ void Context::addPlan(Vec2 coord1, Vec2 coord2) {
     this->m_plans[m_num_plans++] = Plan{coord1, normal};
 }
 
+void Context::addWater(Vec2 coord1, Vec2 coord2) {
+    //Il faut ici ajouter un élément de la classe Particle au tableau m_particles dont le numéro est m_num_particles
+    Vec2 directeur = Vec2{(coord2.x - coord1.x),(coord2.y - coord1.y)};
+    Vec2 normal = Vec2{(-directeur.y)/(std::sqrt(directeur.x*directeur.x + directeur.y*directeur.y)),
+                      (directeur.x)/(std::sqrt(directeur.x*directeur.x + directeur.y*directeur.y))};
+    this->m_pounds[m_num_pounds++] = Water{Plan{coord1, normal}};
+}
+
 void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {
   applyExternalForce(dt);
-  dampVelocities(); // Frottements
+  dampVelocities(dt); // Frottements
   updateExpectedPosition(dt); // Position attendue en fonction de la vitesse
   addDynamicContactConstraints(); // Itérer sur les différents types de contraintes (chevauchement avec un colider / autre particule)
   addStaticContactConstraints();
@@ -75,8 +85,21 @@ void Context::applyExternalForce(float dt)
   }
 }
 
-void Context::dampVelocities()
+void Context::dampVelocities(float dt)
 {
+  Vec2 Frottements;
+  for (int i =0;i <this->m_num_particles; i++){
+    //Frottements
+    for (int w = 0;w<this->m_num_pounds;w++){
+      if (this->m_particles[i].next_pos.y < this->m_pounds[w].surface.point.y){
+        float k = m_pounds[w].viscosity*6*3.14*this->m_particles[i].radius;
+        Frottements = Vec2{-k*this->m_particles[i].velocity.x, -k*this->m_particles[i].velocity.y};
+        //update velocity
+        this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x + (dt*Frottements.x)/(this->m_particles[i].mass),
+                                        this->m_particles[i].velocity.y + (dt*Frottements.y)/(this->m_particles[i].mass)};
+      }
+    }
+  }
 }
 
 void Context::updateExpectedPosition(float dt)
