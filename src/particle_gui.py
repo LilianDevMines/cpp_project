@@ -41,7 +41,7 @@ class ParticleUI :
         self.addPlan((-10,-8),(10,-8))
         self.addPlan((8,-8),(10,9))
 
-        #self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
+        self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
         
         

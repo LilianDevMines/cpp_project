@@ -78,6 +78,17 @@ void Context::applyExternalForce(float dt)
 
     //Forces
     Vec2 Force = Vec2{Weight.x, Weight.y};
+    
+    for (int w = 0;w<this->m_num_pounds;w++){
+      if (this->m_particles[i].next_pos.y - this->m_particles[i].radius < this->m_pounds[w].surface.point.y){
+        //Archimede
+        float h = this->m_pounds[w].surface.point.y - this->m_particles[i].next_pos.y - this->m_particles[i].radius;
+        Vec2 Archimede = Vec2{0, (this->m_pounds[w].density)*(3.14*(h*h)/3)*(3*h-this->m_particles[i].radius) *g};
+
+        //update Force
+        Force = Vec2{Force.x + Archimede.x, Force.y + Archimede.y};
+      }
+    }
 
     //update velocity
     this->m_particles[i].velocity = Vec2{this->m_particles[i].velocity.x + (dt*Force.x)/(this->m_particles[i].mass),
