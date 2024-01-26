@@ -18,7 +18,7 @@ import py_pbd_simulation as pbd
 class ParticleUI :
     def __init__(self) :
         # create drawing context
-        self.context = pbd.Context(200) # python is responsible of the destruction of the context !
+        self.context = pbd.Context() # python is responsible of the destruction of the context !
         self.width = 1000
         self.height = 1000
 
@@ -35,7 +35,7 @@ class ParticleUI :
 
         # Initialize the scene
         #Add water
-        self.addWater((-10,0),(10,0))
+        #self.addWater((-10,0),(10,0))
         
         self.addPlan((-10,9),(-8,-8))
         self.addPlan((-10,-8),(10,-8))
@@ -65,6 +65,8 @@ class ParticleUI :
         for i in range(self.context.num_particles()):
             # TODO Update particle display coordinate
             particle = self.context.particle(i)
+            draw_id = []
+            draw_id.append(particle.draw_id)
             if particle.radius > 0.0:
                 pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
                 pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
