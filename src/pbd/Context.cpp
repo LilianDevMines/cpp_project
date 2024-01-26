@@ -61,8 +61,12 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
     projectConstraints();
   }
 
+  mergeParticles();
+
   updateVelocityAndPosition(dt);
   applyFriction();
+
+  //mergeParticles();
 
   deleteContactConstraints();
 }
@@ -71,10 +75,11 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 
 void Context::applyExternalForce(float dt)
 {
+  float gravity = g;
   for (int i =0;i <this->m_num_particles; i++){
     //Forces
     //Weight
-    Vec2 Weight{0, - (this->m_particles[i].mass *g)};
+    Vec2 Weight{0, - (this->m_particles[i].mass * gravity)};
 
     //Forces
     Vec2 Force = Vec2{Weight.x, Weight.y};
@@ -83,7 +88,7 @@ void Context::applyExternalForce(float dt)
       if (this->m_particles[i].next_pos.y - this->m_particles[i].radius < this->m_pounds[w].surface.point.y){
         //Archimede
         float h = this->m_pounds[w].surface.point.y - this->m_particles[i].next_pos.y - this->m_particles[i].radius;
-        Vec2 Archimede = Vec2{0, (this->m_pounds[w].density)*(3.14*(h*h)/3)*(3*h-this->m_particles[i].radius) *g};
+        Vec2 Archimede = Vec2{0, (this->m_pounds[w].density)*(3.14*(h*h)/3)*(3*h-this->m_particles[i].radius) *gravity};
 
         //update Force
         Force = Vec2{Force.x + Archimede.x, Force.y + Archimede.y};
@@ -195,6 +200,41 @@ void Context::updateVelocityAndPosition(float dt)
       this->m_particles[i].position = this->m_particles[i].next_pos;
    }
 }                         
+
+
+void Context::mergeParticles()
+{
+  for (int i =0;i <this->m_num_particles; i++){
+    for (int j =0;j <this->m_num_particles; j++){
+      //printf("%d\n", this->m_particles[i].draw_id);
+      if (this->m_particles[i] != this->m_particles[j] and this->m_particles[i].draw_id !=0 and this->m_particles[j].draw_id !=0){
+        if (this->m_particles[i].radius = this->m_particles[j].radius){
+          //printf("%d\n", this->m_particles[i].draw_id);
+          if (norme(Vec2{this->m_particles[i].position.x - this->m_particles[j].position.x,
+                          this->m_particles[i].position.y - this->m_particles[j].position.y}) < this->m_particles[i].radius){
+            this->m_particles[i].mass = this->m_particles[i].mass + this->m_particles[j].mass;
+            this->m_particles[i].radius = this->m_particles[i].radius + this->m_particles[j].radius;
+            this->m_particles[i].velocity = Vec2{(this->m_particles[i].velocity.x + this->m_particles[j].velocity.x)/2,
+                                                  (this->m_particles[i].velocity.y + this->m_particles[j].velocity.y)/2};
+            this->m_particles[i].position = Vec2{(this->m_particles[i].position.x + this->m_particles[j].position.x)/2,
+                                                  (this->m_particles[i].position.y + this->m_particles[j].position.y)/2};
+            this->m_particles[i].next_pos = Vec2{(this->m_particles[i].next_pos.x + this->m_particles[j].next_pos.x)/2,
+                                                  (this->m_particles[i].next_pos.y + this->m_particles[j].next_pos.y)/2};
+            //this->m_particles[i].draw_id = this->m_particles[i].draw_id + this->m_particles[j].draw_id;
+            this->m_particles[j].mass = 0;
+            this->m_particles[j].radius = 0;
+            this->m_particles[j].velocity = Vec2{0,0};
+            this->m_particles[j].position = Vec2{0,0};
+            this->m_particles[j].next_pos = Vec2{0,0};
+            this->m_particles[j].draw_id = 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 
 void Context::applyFriction()
 {

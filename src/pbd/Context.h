@@ -32,6 +32,7 @@ private:
   void addStaticContactConstraints();
   void projectConstraints();
   void updateVelocityAndPosition(float dt);
+  void mergeParticles();
   void applyFriction();
   void deleteContactConstraints();
 
