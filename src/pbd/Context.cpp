@@ -178,24 +178,30 @@ void Context::addDynamicContactConstraints()
 
           if (C < 0)
           {
+            if (particle_i.radius == particle_j.radius)
+            {
+              mergeParticles(particle_i, particle_j);
+            }
+            else
+            {
+              // sigma
+              float sigmai = (1 / particle_i.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
+              float sigmaj = (1 / particle_j.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
 
-            // sigma
-            float sigmai = (1 / particle_i.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
-            float sigmaj = (1 / particle_j.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
+              Vec2 deltaposi;
+              deltaposi.x = -sigmai * (xij.x / norme(xij));
+              deltaposi.y = -sigmai * (xij.y / norme(xij));
+              Vec2 deltaposj;
+              deltaposj.x = sigmaj * (xij.x / norme(xij));
+              deltaposj.y = sigmaj * (xij.y / norme(xij));
 
-            Vec2 deltaposi;
-            deltaposi.x = -sigmai * (xij.x / norme(xij));
-            deltaposi.y = -sigmai * (xij.y / norme(xij));
-            Vec2 deltaposj;
-            deltaposj.x = sigmaj * (xij.x / norme(xij));
-            deltaposj.y = sigmaj * (xij.y / norme(xij));
+              // update next_pos
+              particle_i.next_pos.x += deltaposi.x;
+              particle_i.next_pos.y += deltaposi.y;
 
-            // update next_pos
-            particle_i.next_pos.x += deltaposi.x;
-            particle_i.next_pos.y += deltaposi.y;
-
-            particle_j.next_pos.x += deltaposj.x;
-            particle_j.next_pos.y += deltaposj.y;
+              particle_j.next_pos.x += deltaposj.x;
+              particle_j.next_pos.y += deltaposj.y;
+            }
           }
         }
       }

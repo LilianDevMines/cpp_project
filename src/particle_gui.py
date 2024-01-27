@@ -104,9 +104,9 @@ class ParticleUI :
         # END TODO
 
     def removeUnusedWidgets(self, active_draw_ids):
-        for widget in self.canvas.winfo_children():
-            draw_id = widget.winfo_id()
+        for draw_id in self.canvas.find_all():
             if(draw_id not in active_draw_ids):
+                print('delete', draw_id)
                 self.canvas.delete(draw_id)
 
     def addPlan(self, coord1, coord2):
