@@ -41,6 +41,7 @@ void Context::addPlan(Vec2 coord1, Vec2 coord2, int draw_id)
   new_plan.normal = normal;
   new_plan.point = coord1;
   new_plan.draw_id = draw_id;
+  new_plan.kinetic_friction = 0.8;
   this->m_plans.push_back(new_plan);
 }
 
@@ -75,7 +76,7 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
   }
 
   updateVelocityAndPosition(dt);
-  applyFriction();
+  applyFriction(dt);
 
   deleteContactConstraints();
 }
@@ -246,6 +247,9 @@ void Context::addStaticContactConstraints()
         // Update next position
         particle.next_pos.x += deltapos.x;
         particle.next_pos.y += deltapos.y;
+
+        // Frottements
+        particle.velocity.x += -particle.mass * g * plan.kinetic_friction;
       }
     }
   }
@@ -319,8 +323,33 @@ void Context::mergeParticles()
   }
 }
 
-void Context::applyFriction()
+void Context::applyFriction(float dt)
 {
+  for (std::list<Particle>::iterator it_particle = this->m_particles.begin(); it_particle != this->m_particles.end(); ++it_particle)
+  {
+    Particle &particle = *it_particle;
+    for (std::list<Plan>::iterator it_plan = this->m_plans.begin(); it_plan != this->m_plans.end(); ++it_plan)
+    {
+      Plan &plan = *it_plan;
+      Vec2 proj_orig;
+      proj_orig.x = particle.position.x - plan.point.x;
+      proj_orig.y = particle.position.y - plan.point.y;
+      // Calcule P - Q où P à projeter et Q dans le plan
+      Vec2 projection;
+      projection.x = particle.position.x - produit_scalaire(proj_orig, plan.normal) * plan.normal.x;
+      projection.y = particle.position.y - produit_scalaire(proj_orig, plan.normal) * plan.normal.y;
+      // Calcule la projection de P sur le plan
+      Vec2 vector;
+      vector.x = particle.next_pos.x - projection.x;
+      vector.y = particle.next_pos.y - projection.y;
+
+      if (produit_scalaire(vector, plan.normal) < particle.radius)
+      {
+        // Frottements
+        particle.velocity.x += -particle.mass * g * plan.kinetic_friction * dt;
+      }
+    }
+  }
 }
 
 void Context::deleteContactConstraints()

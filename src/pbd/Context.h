@@ -49,7 +49,7 @@ private:
   void projectConstraints();
   void updateVelocityAndPosition(float dt);
   void mergeParticles();
-  void applyFriction();
+  void applyFriction(float dt);
   void deleteContactConstraints();
   // Data
   std::list<Particle> m_particles; // List of particles
