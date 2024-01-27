@@ -2,7 +2,11 @@ import pathlib
 import time
 import os
 import sys
+from math import floor
+import random
 from tkinter import *
+
+colors = ['red', 'green', 'blue', 'yellow','orange','purple','pink','cyan','magenta','brown','grey','black']
 
 ##################################################
 # Initialize C++ bindings
@@ -35,8 +39,15 @@ class ParticleUI :
 
         # Initialize the scene
         #Add water
-        #self.addWater((-10,0),(10,0))
         self.plans_drawid = []
+
+        #UNCOMMENT TTHIS TO ADD WATER AND SEE ARCHIMED PRINCIPLE
+        #self.addWater((-10,0),(10,0))
+
+
+
+
+        #add Plan
         self.addPlan((-10,9),(-8,-8))
         self.addPlan((-10,-8),(10,-8))
         self.addPlan((8,-8),(10,9))
@@ -57,7 +68,9 @@ class ParticleUI :
         # launch UI event loop
         self.window.mainloop()
 
+    
     def animate(self) :
+        colors = {0.2:'red',0.4: 'green', 0.8:'blue',1.6: 'yellow',3.2:'orange',6.4:'purple'}#,'pink','cyan','magenta','brown','grey','black']
         """ animation loop """
         # APPLY PHYSICAL UPDATES HERE !
         for i in range(6) :
@@ -71,6 +84,7 @@ class ParticleUI :
                 pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
                 pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
                 self.canvas.coords(particle.draw_id, *self.worldToView(pmin), * self.worldToView(pmax))
+                self.canvas.itemconfig(particle.draw_id, fill=colors[round(particle.radius,1)])
             # print("Update code to display particules !")
             # print(" - Use the function coord from Tk.Canvas to update the bounding box of displayed ellipses corresponding to parameters")
             # print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
@@ -129,7 +143,8 @@ class ParticleUI :
 
         # Create a polygon that represents the area under the line
         points = [view_coord1[0], self.height, view_coord1[0], view_coord1[1], view_coord2[0], view_coord2[1], view_coord2[0], self.height]
-        self.canvas.create_polygon(points, fill='#AEC6CF')
+        draw_id = self.canvas.create_polygon(points, fill='#AEC6CF')
+        self.plans_drawid.append(draw_id)
 
         # Add the plan to the context
         self.context.addWater(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
@@ -138,7 +153,10 @@ class ParticleUI :
     # All mouse and key callbacks
 
     def mouseCallback(self, event):
-        self.addParticle(self.viewToWorld((event.x,event.y)), 0.2, 1.0, (0.0, 0.0), "red")
+        radius_list = [0.2, 0.4, 0.8]
+        probabilities = [0.7, 0.2, 0.1]  # Adjust these values to your needs
+        radius = random.choices(radius_list, probabilities)[0]
+        self.addParticle(self.viewToWorld((event.x,event.y)), radius, 1.0, (0.0, 0.0), "red")
     
     def keyCallback(self, event):
         print(repr(event.char))

@@ -58,6 +58,8 @@ void Context::addWater(Vec2 coord1, Vec2 coord2)
   new_plan.point = coord1;
   Water new_water;
   new_water.surface = new_plan;
+  new_water.density = 10;
+  new_water.viscosity = 0.1;
   this->m_pounds.push_back(new_water);
 }
 
@@ -76,7 +78,7 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
   }
 
   updateVelocityAndPosition(dt);
-  applyFriction(dt);
+  //applyFriction(dt); 
 
   deleteContactConstraints();
 }
@@ -102,13 +104,14 @@ void Context::applyExternalForce(float dt)
     for (std::list<Water>::iterator it_pound = this->m_pounds.begin(); it_pound != this->m_pounds.end(); ++it_pound)
     {
       Water &pound = *it_pound;
-      if (particle.next_pos.y - particle.radius < pound.surface.point.y)
+      float gravity = g;
+      if (particle.next_pos.y - particle.radius  < pound.surface.point.y)
       {
         // Archimede
-        float h = pound.surface.point.y - particle.next_pos.y - particle.radius;
+        float h = std::abs(pound.surface.point.y - particle.next_pos.y - particle.radius);
         Vec2 Archimede;
         Archimede.x = 0;
-        Archimede.y = (pound.density) * (3.14 * (h * h) / 3) * (3 * h - particle.radius) * g;
+        Archimede.y = (pound.density) * (3.14 * (h * h) / 3) * (3 * h - particle.radius) * gravity;
 
         // update Force
         Force.x += Archimede.x;
@@ -303,7 +306,7 @@ void Context::mergeParticles()
         float C = norme(xij) - (particle_i.radius + particle_j.radius);
         if (C <= 0)
         {
-          if (particle_i.radius == particle_j.radius)
+          if (particle_i.radius == particle_j.radius and particle_i.radius <= 6.4)
           {
             // Merge particles
             particle_i.mass = particle_i.mass + particle_j.mass;
@@ -346,7 +349,27 @@ void Context::applyFriction(float dt)
       if (produit_scalaire(vector, plan.normal) < particle.radius)
       {
         // Frottements
-        particle.velocity.x += -particle.mass * g * plan.kinetic_friction * dt;
+        if (norme(particle.velocity) > 0.01) {
+        
+          Vec2 normalized_velocity;
+          normalized_velocity.x = particle.velocity.x / norme(particle.velocity);
+          normalized_velocity.y = particle.velocity.y / norme(particle.velocity);
+          std::cout << particle.mass * plan.kinetic_friction * normalized_velocity.x << std::endl;
+          if(std::abs((1/particle.velocity.x) * particle.mass * plan.kinetic_friction * normalized_velocity.x) < std::abs(particle.velocity.x)) {
+            particle.velocity.x -= (1/particle.velocity.x) * particle.mass * plan.kinetic_friction * normalized_velocity.x;
+            
+          }
+          else {
+            particle.velocity.x = 0;
+          }
+        
+          if(std::abs((1/particle.velocity.y) * particle.mass * plan.kinetic_friction * normalized_velocity.y ) < std::abs(particle.velocity.y)) {
+            particle.velocity.y -= particle.mass * plan.kinetic_friction * normalized_velocity.y;
+          }
+          else {
+            particle.velocity.y = 0;
+          }
+        }
       }
     }
   }
