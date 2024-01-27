@@ -36,13 +36,14 @@ class ParticleUI :
         # Initialize the scene
         #Add water
         #self.addWater((-10,0),(10,0))
-        
+        self.plans_drawid = []
         self.addPlan((-10,9),(-8,-8))
         self.addPlan((-10,-8),(10,-8))
         self.addPlan((8,-8),(10,9))
 
         #self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
+        
         
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))
@@ -61,11 +62,11 @@ class ParticleUI :
         # APPLY PHYSICAL UPDATES HERE !
         for i in range(6) :
             self.context.updatePhysicalSystem(0.016/6.0, 1) # can be called more than once..., just devise dt
+        particules_draw_id = []
         for i in range(self.context.num_particles()):
             # TODO Update particle display coordinate
             particle = self.context.particle(i)
-            draw_id = []
-            draw_id.append(particle.draw_id)
+            particules_draw_id.append(particle.draw_id)
             if particle.radius > 0.0:
                 pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
                 pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
@@ -75,6 +76,9 @@ class ParticleUI :
             # print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
             # print(" - worldToView return a tuple, tuple expension * can be used to generate list of function parameters")
             # END TODO
+        # Remove unused widgets
+        self.removeUnusedWidgets(particules_draw_id + self.plans_drawid);    
+            
         self.window.update()
         self.window.after(16, self.animate)
 
@@ -99,10 +103,11 @@ class ParticleUI :
         # print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
         # END TODO
 
-    def getDrawIds(self):
-        draw_ids = []
+    def removeUnusedWidgets(self, active_draw_ids):
         for widget in self.canvas.winfo_children():
-            draw_ids.append(widget.winfo_id())
+            draw_id = widget.winfo_id()
+            if(draw_id not in active_draw_ids):
+                self.canvas.delete(draw_id)
 
     def addPlan(self, coord1, coord2):
         # Convert world coordinates to view coordinates
@@ -111,10 +116,10 @@ class ParticleUI :
 
         # Create a polygon that represents the area under the line
         points = [view_coord1[0], self.height, view_coord1[0], view_coord1[1], view_coord2[0], view_coord2[1], view_coord2[0], self.height]
-        self.canvas.create_polygon(points, fill='#836953')
-
+        draw_id = self.canvas.create_polygon(points, fill='#836953')
+        self.plans_drawid.append(draw_id)
         # Add the plan to the context
-        self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2))
+        self.context.addPlan(pbd.Vec2(*coord1), pbd.Vec2(*coord2), draw_id)
     
     def addWater(self, coord1, coord2):
         # Convert world coordinates to view coordinates
@@ -142,4 +147,3 @@ class ParticleUI :
 
 gui = ParticleUI()
 gui.launchSimulation()
-
