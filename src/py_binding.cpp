@@ -21,7 +21,7 @@ PYBIND11_MODULE(py_pbd_simulation, m)
         .def_readonly("draw_id", &Particle::draw_id);
 
     py::class_<Context>(m, "Context")
-        .def(py::init<int>())
+        .def(py::init<>())
         .def("num_particles", &Context::num_particles)
         .def("updatePhysicalSystem", &Context::updatePhysicalSystem)
         .def("addParticle", &Context::addParticle)

@@ -18,7 +18,7 @@ import py_pbd_simulation as pbd
 class ParticleUI :
     def __init__(self) :
         # create drawing context
-        self.context = pbd.Context(200) # python is responsible of the destruction of the context !
+        self.context = pbd.Context() # python is responsible of the destruction of the context !
         self.width = 1000
         self.height = 1000
 
@@ -35,13 +35,13 @@ class ParticleUI :
 
         # Initialize the scene
         #Add water
-        self.addWater((-10,0),(10,0))
+        #self.addWater((-10,0),(10,0))
         
         self.addPlan((-10,9),(-8,-8))
         self.addPlan((-10,-8),(10,-8))
         self.addPlan((8,-8),(10,9))
 
-        self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
+        #self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
         
         # Initialize Mouse and Key events
@@ -64,9 +64,12 @@ class ParticleUI :
         for i in range(self.context.num_particles()):
             # TODO Update particle display coordinate
             particle = self.context.particle(i)
-            pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
-            pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
-            self.canvas.coords(particle.draw_id, *self.worldToView(pmin), * self.worldToView(pmax))
+            draw_id = []
+            draw_id.append(particle.draw_id)
+            if particle.radius > 0.0:
+                pmin = (particle.position.x - particle.radius, particle.position.y - particle.radius)
+                pmax = (particle.position.x + particle.radius, particle.position.y + particle.radius)
+                self.canvas.coords(particle.draw_id, *self.worldToView(pmin), * self.worldToView(pmax))
             # print("Update code to display particules !")
             # print(" - Use the function coord from Tk.Canvas to update the bounding box of displayed ellipses corresponding to parameters")
             # print(" - Screen coordinates can be combuted from world coordinates using the methode worldToView")
