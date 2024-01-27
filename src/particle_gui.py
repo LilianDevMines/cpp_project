@@ -44,7 +44,6 @@ class ParticleUI :
         self.addParticle((0,8), 2.0, 10.0, (1.0, 2.0), "orange")
         #self.addParticle((0,-10), 4.0, 2.0, (0.0, 0.0), "orange")
         
-        
         # Initialize Mouse and Key events
         self.canvas.bind("<Button-1>", lambda event: self.mouseCallback(event))
         self.window.bind("<Key>", lambda event: self.keyCallback(event)) # bind all key
@@ -96,6 +95,11 @@ class ParticleUI :
         # print("  - You will also need a function on c++ side")
         # print("  - For a C++ struct, it is possible to define a binding init function even in absence of constructor, simply give as template parameters the types of the structure attributs")
         # END TODO
+
+    def getDrawIds(self):
+        draw_ids = []
+        for widget in self.canvas.winfo_children():
+            draw_ids.append(widget.winfo_id())
 
     def addPlan(self, coord1, coord2):
         # Convert world coordinates to view coordinates

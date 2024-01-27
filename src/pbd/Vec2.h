@@ -1,11 +1,12 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 // ------------------------------------------------
 
-struct Vec2 {
-  float x = {};
-  float y = {};
+struct Vec2
+{
+  float x;
+  float y;
 };
 
 // ------------------------------------------------
