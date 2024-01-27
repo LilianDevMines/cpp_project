@@ -96,6 +96,7 @@ class ParticleUI :
         #b_min = self.worldToView( (x_world-radius,y_world-radius) )
         #b_max = self.worldToView( (x_world+radius,y_world+radius) )
         draw_id = self.canvas.create_oval(0,0,0,0,fill=color)
+        #print(draw_id)
         # TODO add particle in C++ context
         self.context.addParticle(pbd.Vec2(*world_pos), radius, mass, pbd.Vec2(*velocity), draw_id)
         # print("Update code to add particules!")
@@ -106,7 +107,7 @@ class ParticleUI :
     def removeUnusedWidgets(self, active_draw_ids):
         for draw_id in self.canvas.find_all():
             if(draw_id not in active_draw_ids):
-                print('delete', draw_id)
+                #print('delete', draw_id)
                 self.canvas.delete(draw_id)
 
     def addPlan(self, coord1, coord2):

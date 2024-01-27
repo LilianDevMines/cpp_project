@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <list>
 #include <stdexcept>
+#include <set>
 
 // ------------------------------------------------
 
@@ -47,14 +48,15 @@ private:
   void addStaticContactConstraints();
   void projectConstraints();
   void updateVelocityAndPosition(float dt);
-  void mergeParticles(Particle &particle_i, Particle &particle_j);
+  void mergeParticles();
   void applyFriction();
   void deleteContactConstraints();
   // Data
   std::list<Particle> m_particles; // List of particles
   std::list<Plan> m_plans;         // List of plans
   std::list<Water> m_pounds;
-  std::list<int> m_dead_particles; // List of dead particles
+  std::set<int> m_particles_merged_id; //Id of particles merged
+  bool hasMerged;
 };
 
 // ------------------------------------------------
