@@ -25,6 +25,7 @@ void Context::addParticle(Vec2 pos, float radius, float mass, Vec2 velocity, int
   particle.mass = mass;
   particle.velocity = velocity;
   particle.draw_id = draw_id;
+  particle.merged = false;
   this->m_particles.push_back(particle);
 }
 
@@ -62,9 +63,9 @@ void Context::addWater(Vec2 coord1, Vec2 coord2)
 void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
 {
   applyExternalForce(dt);
-  dampVelocities(dt);             // Frottements
-  updateExpectedPosition(dt);     // Position attendue en fonction de la vitesse
-  mergeParticles();
+  dampVelocities(dt);         // Frottements
+  updateExpectedPosition(dt); // Position attendue en fonction de la vitesse
+  mergeParticles();           // Merged particule if necessary after having applied forces
   addDynamicContactConstraints();
   addStaticContactConstraints(); // Itérer sur les différents types de contraintes (chevauchement avec un colider / autre particule)
 
@@ -73,8 +74,6 @@ void Context::updatePhysicalSystem(float dt, int num_constraint_relaxation)
     projectConstraints();
   }
 
-
-  
   updateVelocityAndPosition(dt);
   applyFriction();
 
@@ -170,43 +169,45 @@ void Context::addDynamicContactConstraints()
       Particle &particle_j = *it_j;
       if (&particle_i != &particle_j)
       {
-          // xij
-          Vec2 xij;
-          xij.x = particle_i.next_pos.x - particle_j.next_pos.x;
-          xij.y = particle_i.next_pos.y - particle_j.next_pos.y;
+        // xij
+        Vec2 xij;
+        xij.x = particle_i.next_pos.x - particle_j.next_pos.x;
+        xij.y = particle_i.next_pos.y - particle_j.next_pos.y;
+        float norm_xij = norme(xij);
 
-          // C
-          float C = norme(xij) - (particle_i.radius + particle_j.radius);
-          if (C < 0)
+        // C
+        float C = norm_xij - (particle_i.radius + particle_j.radius);
+        if (C <= 0)
+        {
+          // Check if the particule is in contact with a merged particule
+          if (particle_i.merged || particle_j.merged)
           {
-          for (std::set<int>::iterator id = this->m_particles_merged_id.begin();id!=this->m_particles_merged_id.end();id++){
-              if (particle_i.draw_id==*id || particle_j.draw_id==*id){
-                this->m_particles_merged_id.insert(particle_j.draw_id);
-                this->m_particles_merged_id.insert(particle_i.draw_id);
-              }
+            particle_i.merged = true;
+            particle_j.merged = true;
           }
-            // sigma
-            float sigmai = (1 / particle_i.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
-            float sigmaj = (1 / particle_j.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
 
-            Vec2 deltaposi;
-            deltaposi.x = -sigmai * (xij.x / norme(xij));
-            deltaposi.y = -sigmai * (xij.y / norme(xij));
-            Vec2 deltaposj;
-            deltaposj.x = sigmaj * (xij.x / norme(xij));
-            deltaposj.y = sigmaj * (xij.y / norme(xij));
+          // sigma
+          float sigmai = (1 / particle_i.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
+          float sigmaj = (1 / particle_j.mass) / ((1 / particle_i.mass) + (1 / particle_j.mass)) * C;
 
-            // update next_pos
-            particle_i.next_pos.x += deltaposi.x;
-            particle_i.next_pos.y += deltaposi.y;
+          Vec2 deltaposi;
+          deltaposi.x = -sigmai * (xij.x / norm_xij);
+          deltaposi.y = -sigmai * (xij.y / norm_xij);
+          Vec2 deltaposj;
+          deltaposj.x = sigmaj * (xij.x / norm_xij);
+          deltaposj.y = sigmaj * (xij.y / norm_xij);
 
-            particle_j.next_pos.x += deltaposj.x;
-            particle_j.next_pos.y += deltaposj.y;
-          }
+          // update next_pos
+          particle_i.next_pos.x += deltaposi.x;
+          particle_i.next_pos.y += deltaposi.y;
+
+          particle_j.next_pos.x += deltaposj.x;
+          particle_j.next_pos.y += deltaposj.y;
         }
       }
     }
   }
+}
 
 void Context::addStaticContactConstraints()
 {
@@ -231,21 +232,13 @@ void Context::addStaticContactConstraints()
       if (produit_scalaire(vector, plan.normal) < particle.radius)
       {
         Vec2 qc;
-        qc.x = particle.next_pos.x -
-               (produit_scalaire(vector,
-                                 plan.normal) *
-                plan.normal.x),
-        qc.y = particle.next_pos.y -
-               (produit_scalaire(vector,
-                                 plan.normal) *
-                plan.normal.y);
+        qc.x = particle.next_pos.x - (produit_scalaire(vector, plan.normal) * plan.normal.x);
+        qc.y = particle.next_pos.y - (produit_scalaire(vector, plan.normal) * plan.normal.y);
 
         Vec2 vector2;
         vector2.x = particle.next_pos.x - qc.x;
         vector2.y = particle.next_pos.y - qc.y;
-        float C = produit_scalaire(vector2,
-                                   plan.normal) -
-                  particle.radius;
+        float C = produit_scalaire(vector2, plan.normal) - particle.radius;
 
         Vec2 deltapos;
         deltapos.x = -C * plan.normal.x;
@@ -253,14 +246,6 @@ void Context::addStaticContactConstraints()
         // Update next position
         particle.next_pos.x += deltapos.x;
         particle.next_pos.y += deltapos.y;
-
-        // Update velocity
-        // for (std::set<int>::iterator id = this->m_particles_merged_id.begin();id!=this->m_particles_merged_id.end();id++){
-        // if (particle.draw_id==*id){
-        //   this->m_particles_merged_id.insert(particle_j.draw_id);
-        // //         this->m_particles_merged_id.insert(particle_i.draw_id);
-        // //       }
-        //   //}
       }
     }
   }
@@ -275,22 +260,21 @@ void Context::updateVelocityAndPosition(float dt)
   for (std::list<Particle>::iterator it = this->m_particles.begin(); it != this->m_particles.end(); ++it)
   {
     Particle &particle = *it;
-    // update velocity
-    bool isInMerged = false;
-    for (std::set<int>::iterator id = this->m_particles_merged_id.begin();id!=this->m_particles_merged_id.end();id++){
-      if (it->draw_id==*id){
-        isInMerged = true;
-        this->m_particles_merged_id.erase(id);
-      }
-    }
 
-    if(isInMerged) {
+    // update velocity
+    if (particle.merged)
+    {
       particle.velocity.x = 0;
       particle.velocity.y = 0;
-    } else {
+      std::cout << particle.draw_id << std::endl;
+      particle.merged = false;
+    }
+    else
+    {
       particle.velocity.x = (particle.next_pos.x - particle.position.x) / dt;
       particle.velocity.y = (particle.next_pos.y - particle.position.y) / dt;
     }
+
     // update position
     particle.position = particle.next_pos;
   }
@@ -306,49 +290,34 @@ void Context::mergeParticles()
       Particle &particle_j = *it_j;
       if (&particle_i != &particle_j)
       {
-          // xij
-          Vec2 xij;
-          xij.x = particle_i.next_pos.x - particle_j.next_pos.x;
-          xij.y = particle_i.next_pos.y - particle_j.next_pos.y;
+        // xij
+        Vec2 xij;
+        xij.x = particle_i.next_pos.x - particle_j.next_pos.x;
+        xij.y = particle_i.next_pos.y - particle_j.next_pos.y;
 
-          // C
-          float C = norme(xij) - (particle_i.radius + particle_j.radius);
-          if (C < 0)
+        // C
+        float C = norme(xij) - (particle_i.radius + particle_j.radius);
+        if (C <= 0)
+        {
+          if (particle_i.radius == particle_j.radius)
           {
-            if (particle_i.radius == particle_j.radius)
-            {
-              // Merge particles
-              float new_mass =particle_i.mass + particle_j.mass;
-              float new_radius = particle_i.radius + particle_j.radius;
-              Vec2 new_velocity;
-              new_velocity.x = (particle_i.velocity.x * particle_i.mass + particle_j.velocity.x * particle_j.mass) / (particle_i.mass + particle_j.mass);
-              new_velocity.y =(particle_i.velocity.y * particle_i.mass + particle_j.velocity.y * particle_j.mass) / (particle_i.mass + particle_j.mass);
-              Vec2 new_position;
-              new_position.x = (particle_i.position.x * particle_i.mass + particle_j.position.x * particle_j.mass) / (particle_i.mass + particle_j.mass);
-              new_position.y = (particle_i.position.y * particle_i.mass + particle_j.position.y * particle_j.mass) / (particle_i.mass + particle_j.mass);
-
-              // Remove the merged particle from the list
-              // We need to find the particle in the list by iterating and using references
-              for (std::list<Particle>::iterator it = this->m_particles.begin(); it != this->m_particles.end(); ++it)
-              {
-                if (&(*it) == &particle_j)
-                {
-                  // Remove the merged particle from the list
-                  this->m_particles.erase(it);
-                  break;
-                }
-              }
-              particle_i.mass = new_mass;
-              particle_i.radius = new_radius;
-              particle_i.velocity = new_velocity;
-              particle_i.position = new_position;
-              this->m_particles_merged_id.insert(particle_i.draw_id);
-            }
+            // Merge particles
+            particle_i.mass = particle_i.mass + particle_j.mass;
+            particle_i.radius = particle_i.radius + particle_j.radius;
+            particle_i.velocity.x = (particle_i.velocity.x * particle_i.mass + particle_j.velocity.x * particle_j.mass) / (particle_i.mass + particle_j.mass);
+            particle_i.velocity.y = (particle_i.velocity.y * particle_i.mass + particle_j.velocity.y * particle_j.mass) / (particle_i.mass + particle_j.mass);
+            particle_i.position.x = (particle_i.position.x + particle_j.position.x) / 2;
+            particle_i.position.y = (particle_i.position.y + particle_j.position.y) / 2;
+            // Notify that the paticle has been merged
+            particle_i.merged = true;
+            // Remove the particle unused
+            it_j = this->m_particles.erase(it_j);
           }
         }
       }
     }
   }
+}
 
 void Context::applyFriction()
 {

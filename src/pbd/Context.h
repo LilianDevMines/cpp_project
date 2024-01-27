@@ -54,9 +54,7 @@ private:
   // Data
   std::list<Particle> m_particles; // List of particles
   std::list<Plan> m_plans;         // List of plans
-  std::list<Water> m_pounds;
-  std::set<int> m_particles_merged_id; //Id of particles merged
-  bool hasMerged;
+  std::list<Water> m_pounds;       // List of water pounds
 };
 
 // ------------------------------------------------

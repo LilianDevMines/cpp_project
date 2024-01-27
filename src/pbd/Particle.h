@@ -13,6 +13,7 @@ struct Particle
   float mass;
   float radius; // radius of the particle
   int draw_id;  // id used to identify drawing element associated to the sphere
+  bool merged;
 };
 
 // ------------------------------------------------
